@@ -27,6 +27,7 @@ func handleRequests() {
 	// finally, instead of passing in nil, we want
 	// to pass in our newly created router as the second
 	// argument
+	// check
 
 	fmt.Printf("Starting server at port 10000\n")
 	log.Fatal(http.ListenAndServe("192.168.0.112:10000", myRouter))

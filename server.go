@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/gorilla/mux"
 )
@@ -35,12 +36,15 @@ func handleRequests() {
 }
 
 var count int = 0
+var m sync.Mutex
 
 func add(w http.ResponseWriter, r *http.Request) {
+	m.Lock()
 	for i := 0; i < 10; i++ {
 		count += 1
 	}
 	fmt.Fprintf(w, "Level: "+strconv.Itoa(count))
+	m.Unlock()
 
 }
 func main() {
@@ -53,7 +57,7 @@ type Result struct {
 }
 
 func wronglevel(w http.ResponseWriter, r *http.Request) {
-
+	m.Lock()
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var result Result
 	err := json.Unmarshal(reqBody, &result)
@@ -84,5 +88,6 @@ func wronglevel(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println("response Body:", string(body))
+	m.Unlock()
 
 }

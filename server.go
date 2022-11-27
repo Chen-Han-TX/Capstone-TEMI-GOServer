@@ -3,15 +3,29 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 
 	"github.com/gorilla/mux"
 )
+
+type Users struct {
+	XMLName xml.Name `xml:"users"`
+	Users   []User   `xml:"user"`
+}
+
+type User struct {
+	XMLName xml.Name `xml:"user"`
+	Name    string   `xml:"name"`
+	Ip      string   `xml:"ip"`
+	Port    string   `xml:"port"`
+}
 
 func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the HomePage!")
@@ -70,6 +84,17 @@ func wronglevel(w http.ResponseWriter, r *http.Request) {
 
 	// Match the pattern using XML
 	// using placeholder
+
+	xmlFile, err := os.Open("addresses.xml")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer xmlFile.Close()
+	byteValue, _ := ioutil.ReadAll(xmlFile)
+	var users Users
+	xml.Unmarshal(byteValue, &users)
+	fmt.Println(users.Users[0].Ip)
+
 	url := "http://192.168.0.205:8080/?level=" + result.Level + "&shelfno=" + result.ShelfNo
 	fmt.Println("URL:>", url)
 

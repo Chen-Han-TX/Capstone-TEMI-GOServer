@@ -15,16 +15,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Users struct {
-	XMLName xml.Name `xml:"users"`
-	Users   []User   `xml:"user"`
+type Clients struct {
+	XMLName xml.Name `xml:"clients"`
+	Clients []Client `xml:"client"`
 }
 
-type User struct {
-	XMLName xml.Name `xml:"user"`
+type Client struct {
+	XMLName xml.Name `xml:"client"`
 	Name    string   `xml:"name"`
 	Ip      string   `xml:"ip"`
 	Port    string   `xml:"port"`
+}
+
+type Result struct {
+	Level   string `json:"level"`
+	ShelfNo string `json:"shelfno"`
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +50,7 @@ func handleRequests() {
 	// check
 
 	fmt.Printf("Starting server at port 10000\n")
-	log.Fatal(http.ListenAndServe("192.168.0.112:10000", myRouter))
+	log.Fatal(http.ListenAndServe(":10000", myRouter))
 
 }
 
@@ -58,16 +63,12 @@ func add(w http.ResponseWriter, r *http.Request) {
 		count += 1
 	}
 	fmt.Fprintf(w, "Level: "+strconv.Itoa(count))
+
 	m.Unlock()
 
 }
 func main() {
 	handleRequests()
-}
-
-type Result struct {
-	Level   string `json:"level"`
-	ShelfNo string `json:"shelfno"`
 }
 
 func wronglevel(w http.ResponseWriter, r *http.Request) {
@@ -84,16 +85,18 @@ func wronglevel(w http.ResponseWriter, r *http.Request) {
 
 	// Match the pattern using XML
 	// using placeholder
-
 	xmlFile, err := os.Open("addresses.xml")
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	defer xmlFile.Close()
 	byteValue, _ := ioutil.ReadAll(xmlFile)
-	var users Users
-	xml.Unmarshal(byteValue, &users)
-	fmt.Println(users.Users[0].Ip)
+	var clients Clients
+	xml.Unmarshal(byteValue, &clients)
+	fmt.Fprintf(w, clients.Clients[0].Name)
+	fmt.Fprintf(w, clients.Clients[0].Ip)
+	fmt.Fprintf(w, clients.Clients[0].Port)
 
 	url := "http://192.168.0.205:8080/?level=" + result.Level + "&shelfno=" + result.ShelfNo
 	fmt.Println("URL:>", url)

@@ -97,8 +97,14 @@ func wronglevel(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, clients.Clients[0].Name)
 	fmt.Fprintf(w, clients.Clients[0].Ip)
 	fmt.Fprintf(w, clients.Clients[0].Port)
+	var url string
+	if result.Level == "4" {
+		url = "http://" + clients.Clients[1].Ip + ":" + clients.Clients[1].Port + "/?level=" + result.Level + "&shelfno=" + result.ShelfNo
+	} else if result.Level == "3" {
+		url = "http://" + clients.Clients[0].Ip + ":" + clients.Clients[0].Port + "/?level=" + result.Level + "&shelfno=" + result.ShelfNo
+	}
 
-	url := "http://192.168.0.205:8080/?level=" + result.Level + "&shelfno=" + result.ShelfNo
+	// url := "http://192.168.0.205:8080/?level=" + result.Level + "&shelfno=" + result.ShelfNo
 	fmt.Println("URL:>", url)
 
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))

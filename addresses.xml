@@ -7,7 +7,7 @@
     </client>
     <client>
         <name>TL4</name>
-        <ip>192.168.0.204</ip>
-        <port>8080</port>
+        <ip>192.168.0.74</ip>
+        <port>8081</port>
     </client>
 </clients>

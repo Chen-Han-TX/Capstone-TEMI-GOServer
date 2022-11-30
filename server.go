@@ -94,22 +94,20 @@ func wronglevel(w http.ResponseWriter, r *http.Request) {
 	byteValue, _ := ioutil.ReadAll(xmlFile)
 	var clients Clients
 	xml.Unmarshal(byteValue, &clients)
-	fmt.Fprintf(w, clients.Clients[0].Name)
-	fmt.Fprintf(w, clients.Clients[0].Ip)
-	fmt.Fprintf(w, clients.Clients[0].Port)
+
 	var url string
 	if result.Level == "4" {
-		url = "http://" + clients.Clients[1].Ip + ":" + clients.Clients[1].Port + "/?level=" + result.Level + "&shelfno=" + result.ShelfNo
+		url = "http://" + clients.Clients[1].Ip + ":" + clients.Clients[1].Port
 	} else if result.Level == "3" {
-		url = "http://" + clients.Clients[0].Ip + ":" + clients.Clients[0].Port + "/?level=" + result.Level + "&shelfno=" + result.ShelfNo
+		url = "http://" + clients.Clients[0].Ip + ":" + clients.Clients[0].Port
 	}
 
-	// url := "http://192.168.0.205:8080/?level=" + result.Level + "&shelfno=" + result.ShelfNo
-	fmt.Println("URL:>", url)
+	fmt.Println("\nURL:>", url)
 
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
 	req.Header.Set("X-Custom-Header", "myvalue")
 	req.Header.Set("Content-Type", "application/json")
+	req.Close = true
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

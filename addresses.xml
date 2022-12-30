@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <clients>
     <client>
-        <name>TL3</name>
+        <name>TL2</name>
         <ip>192.168.0.205</ip>
         <port>8080</port>
     </client>
     <client>
-        <name>TL4</name>
+        <name>TL3</name>
         <ip>192.168.0.74</ip>
         <port>8080</port>
     </client>
+
+    <client>
+        <name>RealTemi</name>
+        <ip>192.168.0.52</ip>
+        <port>8080</port>
+    </client>
+    
+
 </clients> 

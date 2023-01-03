@@ -155,9 +155,30 @@ func getImage(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Image bitmap: " + image.Content)
 
 	// decode the image bitmap
+	// save the image in the src folder
 	base64toJpg(image.Content)
 
-	// save the image in the src folder
+	// test level 2 device: Huawei mate 20
+	// ip_address: 192.168.0.136
+	url := "http://192.168.0.136:8080"
+
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	req.Close = true
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
 
 }
 

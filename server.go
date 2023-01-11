@@ -32,8 +32,10 @@ type Client struct {
 }
 
 type Result struct {
-	Level   string `json:"level"`
-	ShelfNo string `json:"shelfno"`
+	Level    string `json:"level"`
+	ShelfNo  string `json:"shelfno"`
+	BookName string `json:"bookname"`
+	BookID   string `json:"bookid"`
 }
 
 type Image struct {
@@ -88,7 +90,7 @@ func add(w http.ResponseWriter, r *http.Request) {
 }
 
 func wronglevel(w http.ResponseWriter, r *http.Request) {
-	m.Lock()
+	//m.Lock()
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var result Result
 	err := json.Unmarshal(reqBody, &result)
@@ -113,23 +115,24 @@ func wronglevel(w http.ResponseWriter, r *http.Request) {
 	xml.Unmarshal(byteValue, &clients)
 
 	var url string
-	if result.Level == "4" {
-		url = "http://" + clients.Clients[1].Ip + ":" + clients.Clients[1].Port
-	} else if result.Level == "3" {
+	// if book at level 2, call level 2 temi, vice versa
+	if result.Level == "2" {
 		url = "http://" + clients.Clients[0].Ip + ":" + clients.Clients[0].Port
-	}
+	} else if result.Level == "3" {
+		url = "http://" + clients.Clients[1].Ip + ":" + clients.Clients[1].Port
+	} // feel free to add more else if statement for more TEMIs at level 4,5..
 
 	fmt.Println("\nURL:>", url)
 
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	req.Close = true
 	req.Header.Set("X-Custom-Header", "myvalue")
 	req.Header.Set("Content-Type", "application/json")
-	req.Close = true
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -137,7 +140,7 @@ func wronglevel(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println("response Body:", string(body))
-	m.Unlock()
+
 }
 
 func getImage(w http.ResponseWriter, r *http.Request) {
@@ -168,7 +171,6 @@ func getImage(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err.Error())
@@ -184,7 +186,8 @@ func getImage(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// creates a new instance of a mux router
-	myRouter := mux.NewRouter().StrictSlash(true)
+	//myRouter := mux.NewRouter().StrictSlash(true)
+	myRouter := mux.NewRouter()
 	// replace http.HandleFunc with myRouter.HandleFunc
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/wronglevel", wronglevel)
